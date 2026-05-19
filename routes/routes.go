@@ -8,6 +8,7 @@ import (
 
 	swaggerDocs "my-go-backend/docs"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -15,6 +16,15 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
+
+	// CORS Middleware (อนุญาตให้ Frontend ที่อยู่คนละโดเมนเข้าถึง API ได้)
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // ในอนาคตถ้ามีเว็บหน้าบ้านจริง ค่อยเปลี่ยนจาก "*" เป็น "https://your-frontend.com"
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	// Health Check Endpoint
 	r.GET("/health", controllers.HealthCheck)

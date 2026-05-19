@@ -14,8 +14,8 @@ Main concept (Advanced):
 ├── Caching (Redis)
 ├── API Documentation (Swagger/OpenAPI)
 ├── Rate Limiting
-├── CORS (Cross-Origin Resource Sharing)
-├── CI/CD
+├── CORS 
+├── CI/CD (GitHub Actions, Jenkins)
 
 ==================================================================================================================================================
 
