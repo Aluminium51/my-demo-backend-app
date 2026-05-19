@@ -1,0 +1,23 @@
+info:
+  contact: {}
+paths:
+  /health:
+    get:
+      description: ใช้สำหรับให้ระบบ Monitor เช็คว่า API และ Database ยังทำงานปกติหรือไม่
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ระบบปกติ
+          schema:
+            additionalProperties: true
+            type: object
+        "503":
+          description: ระบบมีปัญหา
+          schema:
+            additionalProperties: true
+            type: object
+      summary: ตรวจสอบสถานะระบบ (Health Check)
+      tags:
+      - System
+swagger: "2.0"
