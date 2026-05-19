@@ -8,8 +8,6 @@ import (
 	"my-go-backend/repositories"
 	"my-go-backend/utils"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type UserService interface {
@@ -43,32 +41,36 @@ func (s *userService) Register(name, email, password string, age int) (*models.U
 
 	// Transaction
 	// GORM จะส่งตัวแปร `tx` (ซึ่งเป็น Database ชั่วคราว) มาให้เราใช้ด้านใน
-	err = config.DB.Transaction(func(tx *gorm.DB) error {
+	// err = config.DB.Transaction(func(tx *gorm.DB) error {
 
-		// Step 1: save user to temp DB (tx)
-		// ในการใช้งานจริงระดับ Advance เราจะส่ง `tx` เข้าไปใน repo ด้วย แต่เพื่อความเข้าใจง่ายในสเต็ปนี้ เราจะสั่งตรงผ่าน tx ก่อนครับ
-		if err := tx.Create(user).Error; err != nil {
-			// ถ้าพังตรงนี้ คืนค่า Error ออกไป GORM จะทำการ Rollback อัตโนมัติ
-			return err
-		}
+	// 	// Step 1: save user to temp DB (tx)
+	// 	// ในการใช้งานจริงระดับ Advance เราจะส่ง `tx` เข้าไปใน repo ด้วย แต่เพื่อความเข้าใจง่ายในสเต็ปนี้ เราจะสั่งตรงผ่าน tx ก่อนครับ
+	// 	if err := tx.Create(user).Error; err != nil {
+	// 		// ถ้าพังตรงนี้ คืนค่า Error ออกไป GORM จะทำการ Rollback อัตโนมัติ
+	// 		return err
+	// 	}
 
-		// Step 2: Create new task for the user in the same transaction
-		defaultTask := &models.Task{
-			Title:       "กรอกโปรไฟล์ให้สมบูรณ์",
-			Description: "ยินดีต้อนรับ! กรุณาเข้าไปอัปเดตข้อมูลส่วนตัวของคุณให้ครบถ้วน",
-			UserID:      user.ID, // ได้เลข ID มาจากสเต็ปที่ 1 แล้ว
-		}
+	// 	// Step 2: Create new task for the user in the same transaction
+	// 	defaultTask := &models.Task{
+	// 		Title:       "กรอกโปรไฟล์ให้สมบูรณ์",
+	// 		Description: "ยินดีต้อนรับ! กรุณาเข้าไปอัปเดตข้อมูลส่วนตัวของคุณให้ครบถ้วน",
+	// 		UserID:      user.ID, // ได้เลข ID มาจากสเต็ปที่ 1 แล้ว
+	// 	}
 
-		if err := tx.Create(defaultTask).Error; err != nil {
-			// สมมติตรงนี้พัง (เช่น พิมพ์ฟิลด์ผิด หรือ DB หลุด)
-			// พอคืนค่า Error ตรงนี้ GORM จะแอบไปลบ User ที่เพิ่งสร้างในสเต็ป 1 ทิ้งให้ทันที!
-			return err
-		}
+	// 	if err := tx.Create(defaultTask).Error; err != nil {
+	// 		// สมมติตรงนี้พัง (เช่น พิมพ์ฟิลด์ผิด หรือ DB หลุด)
+	// 		// พอคืนค่า Error ตรงนี้ GORM จะแอบไปลบ User ที่เพิ่งสร้างในสเต็ป 1 ทิ้งให้ทันที!
+	// 		return err
+	// 	}
 
-		// ถ้าทำงานมาถึงตรงนี้โดยไม่มี Error เลย
-		// GORM จะสั่ง Commit บันทึกทั้งคู่ลง DB จริงๆ
-		return nil
-	})
+	// 	// ถ้าทำงานมาถึงตรงนี้โดยไม่มี Error เลย
+	// 	// GORM จะสั่ง Commit บันทึกทั้งคู่ลง DB จริงๆ
+	// 	return nil
+	// })
+
+	if err := s.repo.Create(user); err != nil {
+		return nil, err
+	}
 
 	return user, nil
 }

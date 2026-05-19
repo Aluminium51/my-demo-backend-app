@@ -1,37 +1,37 @@
 name: Go Backend CI Pipeline
 
-# 🚀 บอกหุ่นยนต์ว่า "ให้เริ่มทำงานเมื่อไหร่"
+# 🚀 Tell the runner when to start
 on:
   push:
-    branches: ["main"] # ทำงานเมื่อมีการ push โค้ดเข้ากิ่ง main
+    branches: ["main"] # Runs when code is pushed to the main branch
   pull_request:
-    branches: ["main"] # ทำงานเมื่อมีการเปิด Pull Request เข้ากิ่ง main
+    branches: ["main"] # Runs when a pull request targets the main branch
 
 jobs:
   test-and-build:
-    # 💻 สั่งให้หุ่นยนต์ไปเช่า Ubuntu เวอร์ชันล่าสุดมาทำงาน
+    # 💻 Use the latest Ubuntu runner
     runs-on: ubuntu-latest
 
     steps:
-      # 1: ดึงโค้ดของเราจาก GitHub ลงไปในเครื่องของหุ่นยนต์
+      # 1: Checkout our code from GitHub to the runner
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      # 2: ติดตั้ง Go ลงในเครื่องหุ่นยนต์
+      # 2: Install Go on the runner
       - name: 🐹 Set up Go environment
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25" # ใส่เวอร์ชันภาษา Go ให้ตรงกับที่คุณใช้ (ดูได้จากไฟล์ go.mod)
-          cache: true # เปิดระบบช่วยจำ (Cache) เพื่อให้รอบหน้าโหลด Library ไวขึ้น
+          go-version: "1.25" # Set the Go version to match your project (see go.mod)
+          cache: true # Enable caching to speed up dependency downloads
 
-      # 3: สั่งโหลด Library ทั้งหมดที่อยู่ใน go.mod (เหมือนเราพิมพ์ในเครื่องตัวเอง)
+      # 3: Download all modules from go.mod (same as running 'go mod download' locally)
       - name: 📦 Install dependencies
         run: go mod download
 
-      # 4: สั่งรัน Unit Test ทั้งหมดในโปรเจกต์ (จะไปสั่งรันไฟล์ user_service_test.go ที่เราเขียนไว้)
+      # 4: Run all unit tests in the project
       - name: 🧪 Run Unit Tests
         run: go test -v ./...
 
-      # 5: ลองสั่งคอมไพล์บิลด์แอปดู เพื่อเมคชัวร์ว่าไม่มีโค้ดบรรทัดไหนพิมพ์ผิดจนคอมไพล์ไม่ผ่าน
+      # 5: Build the application to ensure it compiles
       - name: 🔨 Build application
         run: go build -v -o main .
