@@ -85,7 +85,7 @@ func (s *userService) Login(email, password string) (string, error) {
 		return "", errors.New("อีเมลหรือรหัสผ่านไม่ถูกต้อง")
 	}
 
-	return utils.GenerateToken(user.ID)
+	return utils.GenerateToken(user.ID, user.Role)
 }
 
 func (s *userService) GetAll() ([]models.User, error) {

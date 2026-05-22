@@ -35,6 +35,7 @@ func (s *authService) HandleGoogleCallback(googleID, email, name string) (string
 			Name:     name,
 			Email:    email,
 			GoogleID: &googleID,
+			Role:     "user", // Default role
 		}
 		if err := s.userRepo.Create(user); err != nil {
 			return "", nil, err
@@ -42,6 +43,6 @@ func (s *authService) HandleGoogleCallback(googleID, email, name string) (string
 	}
 
 	// 2. return JWT token
-	token, err := utils.GenerateToken(user.ID)
+	token, err := utils.GenerateToken(user.ID, user.Role)
 	return token, user, err
 }

@@ -8,19 +8,17 @@ import (
 )
 
 // GenerateToken จะรับ ID ของ User มาเพื่อฝังไว้ในบัตร
-func GenerateToken(userID uint) (string, error) {
-	// ดึงรหัสลับจากไฟล์ .env
-	secretKey := os.Getenv("JWT_SECRET")
+func GenerateToken(userID uint, role string) (string, error) {
 
 	// สร้าง Payload (ข้อมูลที่จะฝังไว้ในบัตร)
 	claims := jwt.MapClaims{
-		"user_id": userID,                                // ฝัง ID ลงไป เพื่อให้รู้ว่าบัตรนี้เป็นของใคร
-		"exp":     time.Now().Add(time.Hour * 24).Unix(), // บัตรมีอายุ 24 ชั่วโมง
+		"user_id": userID, // ฝัง ID ลงไป เพื่อให้รู้ว่าบัตรนี้เป็นของใคร
+		"role":    role,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(), // Has a 24-hour expiration time
 	}
 
 	// สร้างตัว Token โดยใช้อัลกอริทึม HS256
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// ประทับตราด้วย Secret Key แล้วแปลงเป็น String ยาวๆ ส่งกลับไป
+	secretKey := os.Getenv("JWT_SECRET")
 	return token.SignedString([]byte(secretKey))
 }

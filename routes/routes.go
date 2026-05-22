@@ -48,26 +48,31 @@ func SetupRouter() *gin.Engine {
 
 	api := r.Group("/api/v1")
 	{
-		// === โซนสาธารณะ (ใครๆ ก็เข้าได้) ===
+		// 🟢 โซนทั่วไป: เข้าได้ทุกคน
+		api.POST("/register", userController.CreateUser) // สมัครสมาชิก
 		api.POST("/login", userController.Login)
-		api.POST("/users", userController.CreateUser) // สมัครสมาชิก
 
 		api.GET("/auth/google/login", authController.GoogleLogin)
 		api.GET("/auth/google/callback", authController.GoogleCallback)
 
-		// === โซน VIP (ต้องมี Token เท่านั้น) ===
-		// การใช้ .Use() เป็นการบอกว่า ทุก Route ที่อยู่ใต้กลุ่มนี้ ต้องผ่าน AuthRequired() ก่อนเสมอ
+		// // 🟡 โซนสมาชิก: ต้องมีToken
 		protected := api.Group("/")
 		protected.Use(middlewares.AuthRequired())
 		{
 			// User Management
-			protected.GET("/users", userController.GetUsers)
 			protected.PUT("/users/:id", userController.UpdateUser)
-			protected.DELETE("/users/:id", userController.DeleteUser)
 
 			// Task Management
 			protected.POST("/tasks", taskController.CreateTask)
 			protected.GET("/tasks", taskController.GetTasks)
+
+			// 🔴 โซน Admin Only: ต้องล็อกอิน และต้องมียศ admin
+			adminOnly := protected.Group("/")
+			adminOnly.Use(middlewares.RequireRole("admin"))
+			{
+				adminOnly.GET("/users", userController.GetUsers)          // ดึงรายชื่อทั้งหมด
+				adminOnly.DELETE("/users/:id", userController.DeleteUser) // ลบบัญชีชาวบ้าน
+			}
 		}
 	}
 

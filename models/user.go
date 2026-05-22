@@ -17,4 +17,5 @@ type User struct {
 
 	// one-to-many relationship: หนึ่ง User มีหลาย Task
 	Tasks []Task `json:"tasks" gorm:"foreignKey:UserID"`
+	Role  string `json:"role" gorm:"default:'user'"`
 }
