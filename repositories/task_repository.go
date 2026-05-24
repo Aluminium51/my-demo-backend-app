@@ -9,6 +9,7 @@ import (
 type TaskRepository interface {
 	Create(task *models.Task) error
 	GetByUserID(userID uint) ([]models.Task, error)
+	FindByUserID(userID uint) ([]models.Task, error)
 }
 
 type taskRepository struct{}
@@ -25,6 +26,13 @@ func (r *taskRepository) Create(task *models.Task) error {
 func (r *taskRepository) GetByUserID(userID uint) ([]models.Task, error) {
 	var tasks []models.Task
 	// ดึงเฉพาะงานที่ user_id ตรงกับที่ส่งเข้ามา
+	err := config.DB.Where("user_id = ?", userID).Find(&tasks).Error
+	return tasks, err
+}
+
+func (r *taskRepository) FindByUserID(userID uint) ([]models.Task, error) {
+	var tasks []models.Task
+	// ใช้ GORM ดึงเฉพาะงานที่ตรงกับ User ID นี้
 	err := config.DB.Where("user_id = ?", userID).Find(&tasks).Error
 	return tasks, err
 }

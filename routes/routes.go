@@ -61,10 +61,12 @@ func SetupRouter() *gin.Engine {
 		{
 			// User Management
 			protected.PUT("/users/:id", userController.UpdateUser)
+			protected.GET("/users/me", userController.GetProfile)
 
 			// Task Management
 			protected.POST("/tasks", taskController.CreateTask)
 			protected.GET("/tasks", taskController.GetTasks)
+			protected.GET("/tasks/me", taskController.GetMyTasks)
 
 			// 🔴 โซน Admin Only: ต้องล็อกอิน และต้องมียศ admin
 			adminOnly := protected.Group("/")
@@ -77,6 +79,7 @@ func SetupRouter() *gin.Engine {
 	}
 
 	// swagger
+	// localhost:8081/swagger/index.html
 	swaggerDocs.SwaggerInfo.Title = "My Go Backend API"
 	swaggerDocs.SwaggerInfo.Description = "นี่คือคู่มือ API สำหรับโปรเจกต์จัดการ Task"
 	swaggerDocs.SwaggerInfo.Version = "1.0"

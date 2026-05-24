@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// AuthRequired คือฟังก์ชัน รปภ. ตรวจบัตร
+// ValidateToken
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 1. ขอดูบัตรจาก Header ที่ชื่อ "Authorization"
@@ -38,10 +38,15 @@ func AuthRequired() gin.HandlerFunc {
 			return
 		}
 
-		// 4. บัตรถูกต้อง! แกะเอา user_id ที่ฝังไว้ข้างในออกมา
+		// 4. JWT ถูกต้อง ใส่ user_id และ role ลงใน Context เผื่อให้ Controller เอาไปใช้ต่อ
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			// ฝากข้อมูล user_id ไว้ใน Context เผื่อให้ Controller เอาไปใช้ต่อ
 			c.Set("user_id", claims["user_id"])
+			if role, roleExists := claims["role"].(string); roleExists {
+				c.Set("role", role)
+			} else {
+				// เผื่อกรณี Token เก่าไม่มี Role ฝังมา ให้มองเป็น user ธรรมดาไปก่อน
+				c.Set("role", "user")
+			}
 		}
 
 		// 5. ปล่อยให้เดินผ่านเข้าประตูไปได้!

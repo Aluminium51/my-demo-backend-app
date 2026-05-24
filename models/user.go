@@ -6,7 +6,7 @@ import "gorm.io/gorm"
 type User struct {
 	gorm.Model
 	Name  string `json:"name" binding:"required"`
-	Email string `json:"email" binding:"required,email" gorm:"unique"`
+	Email string `json:"email" binding:"required,email" gorm:"uniqueIndex"`
 	Age   int    `json:"age"`
 	// 1. เอา binding:"required" ออก เพราะคนล็อกอินผ่าน Google จะไม่มีรหัสผ่าน
 	// 2. ใช้ *string (Pointer) เพื่อให้ GORM สามารถเก็บค่า NULL ลงใน Database ได้

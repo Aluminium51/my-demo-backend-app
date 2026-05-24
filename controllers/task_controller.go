@@ -61,3 +61,30 @@ func (ctrl *TaskController) GetTasks(c *gin.Context) {
 		"data":    tasks,
 	})
 }
+
+// GetMyTasks godoc
+// @Summary ดึงรายการงานทั้งหมดของตัวเอง
+// @Description ค้นหา Task ทั้งหมดที่เป็นของ User ที่กำลังล็อกอินอยู่
+// @Tags Tasks
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /tasks/me [get]
+func (ctl *TaskController) GetMyTasks(c *gin.Context) {
+	// ดึง ID จาก JWT เหมือนเดิม
+	userIDContext, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "ไม่พบข้อมูลยืนยันตัวตน"})
+		return
+	}
+	userID := uint(userIDContext.(float64))
+
+	// เรียก Service ไปดึงเฉพาะงานของฉัน
+	tasks, err := ctl.service.GetMyTasks(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": tasks})
+}

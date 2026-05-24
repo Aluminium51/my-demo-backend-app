@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,7 @@ func RequireRole(allowedRoles ...string) gin.HandlerFunc {
 
 		// 3. ถ้าไม่มีสิทธิ์ เตะกลับด้วย 403 Forbidden
 		if !isAllowed {
+			fmt.Printf("ผู้ใช้มีสิทธิ์เป็น '%s' แต่ต้องการสิทธิ์เป็นหนึ่งใน %v\n", userRole, allowedRoles)
 			c.JSON(http.StatusForbidden, gin.H{"error": "คุณไม่มีสิทธิ์เข้าถึงส่วนนี้ (Forbidden)"})
 			c.Abort()
 			return

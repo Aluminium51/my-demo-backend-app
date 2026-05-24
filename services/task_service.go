@@ -8,6 +8,7 @@ import (
 type TaskService interface {
 	CreateTask(title string, description string, userID uint) (*models.Task, error)
 	GetTasksByUserID(userID uint) ([]models.Task, error)
+	GetMyTasks(userID uint) ([]models.Task, error)
 }
 
 type taskService struct {
@@ -38,4 +39,8 @@ func (s *taskService) CreateTask(title string, description string, userID uint) 
 
 func (s *taskService) GetTasksByUserID(userID uint) ([]models.Task, error) {
 	return s.repo.GetByUserID(userID)
+}
+
+func (s *taskService) GetMyTasks(userID uint) ([]models.Task, error) {
+	return s.repo.FindByUserID(userID)
 }

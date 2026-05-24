@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"my-go-backend/models" // เปลี่ยนชื่อ my-go-backend ตามชื่อ module ของคุณ
 
@@ -35,6 +36,16 @@ func ConnectDB() {
 		return
 	}
 
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatal("Failed to get database generic interface:", err)
+	}
+	// ตั้งค่า Connection Pool
+	sqlDB.SetMaxIdleConns(10)           // จำนวน Connection ที่จะเก็บไว้ใน Pool สำหรับการใช้งานซ้ำ (ไม่ต้องสร้างใหม่ทุกครั้ง)
+	sqlDB.SetMaxOpenConns(50)           // จำนวน Connection สูงสุดที่สามารถเปิดได้พร้อมกัน (ถ้าเกินจะรอจนกว่าจะมี Connection ว่าง)
+	sqlDB.SetConnMaxLifetime(time.Hour) // ระยะเวลาที่ Connection จะถูกใช้งานก่อนที่จะถูกปิดและสร้างใหม่ (ช่วยป้องกัน Connection ที่ค้างอยู่เกินไป)
+
 	DB = db
+	DB.AutoMigrate(&models.User{}, &models.Task{})
 	fmt.Println("✅Database Connected Successfully at : ", dsn)
 }

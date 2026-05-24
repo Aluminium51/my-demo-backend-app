@@ -16,6 +16,7 @@ type UserService interface {
 	GetAll() ([]models.User, error)
 	Update(id uint, loggedInUserID uint, input models.User) (*models.User, error)
 	Delete(id uint, loggedInUserID uint) error
+	GetProfile(id uint) (*models.User, error)
 }
 
 type userService struct {
@@ -154,4 +155,12 @@ func (s *userService) Delete(id uint, loggedInUserID uint) error {
 	}
 
 	return s.repo.Delete(user)
+}
+
+func (s *userService) GetProfile(id uint) (*models.User, error) {
+	user, err := s.repo.FindByID(id)
+	if err != nil {
+		return nil, errors.New("User not Found!")
+	}
+	return user, nil
 }

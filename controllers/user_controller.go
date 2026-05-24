@@ -133,3 +133,32 @@ func (ctrl *UserController) DeleteUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
 }
+
+// GetProfile godoc
+// @Summary ดึงข้อมูลโปรไฟล์ของตัวเอง
+// @Description ดึงข้อมูล User จาก JWT Token ที่แนบมา
+// @Tags Users
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /users/me [get]
+func (ctl *UserController) GetProfile(c *gin.Context) {
+	// 1. get user_id from JWT context
+	userIDContext, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "ไม่พบข้อมูลยืนยันตัวตน"})
+		return
+	}
+
+	// 2. แปลง Type จาก float64 (ค่ามาตรฐานของ JWT) เป็น uint
+	userID := uint(userIDContext.(float64))
+
+	// 3. เรียกใช้ Service
+	user, err := ctl.service.GetProfile(userID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": user})
+}
